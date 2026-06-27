@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Interviewer</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🤖 AI Interviewer</h1>
+
+        <div class="status">
+
+            <span id="questionNo">Question 1 / 5</span>
+
+        </div>
+
+        <div id="question" class="question">
+
+            Click Start Interview
+
+        </div>
+
+        <textarea
+            id="answer"
+            placeholder="Write your answer here..."
+        ></textarea>
+
+        <div class="buttons">
+
+            <button id="startBtn" onclick="startInterview()">
+
+                ▶ Start Interview
+
+            </button>
+
+            <button id="submitBtn" onclick="submitAnswer()">
+
+                ✔ Submit Answer
+
+            </button>
+
+        </div>
+
+        <div id="feedback"></div>
+
+        <div class="progress">
+
+            <div id="progressBar"></div>
+
+        </div>
+
+    </div>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
