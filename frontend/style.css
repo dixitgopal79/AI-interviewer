@@ -1,0 +1,347 @@
+/* ---------------------------------------------
+   Token system
+--------------------------------------------- */
+:root{
+  --bg-app:        #14161b;
+  --bg-editor:     #1b1e25;
+  --bg-panel:      #20232b;
+  --bg-inset:      #171a20;
+  --border:        #2c3038;
+  --border-soft:   #262932;
+
+  --text-main:     #d7dae0;
+  --text-dim:      #7e8492;
+  --text-faint:    #4d525e;
+
+  --accent-blue:   #6c9ef8;   /* keywords / primary  */
+  --accent-green:  #7ec699;   /* comments / success  */
+  --accent-amber:  #e5c07b;   /* score / warning     */
+  --accent-red:    #e0685f;   /* errors / low score  */
+  --accent-purple: #b48ead;   /* punctuation accent  */
+
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+
+  --radius: 10px;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+html, body{
+  height:100%;
+  background: var(--bg-app);
+  color: var(--text-main);
+  font-family: var(--font-body);
+}
+
+body{
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding: 48px 20px;
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* faint dot grid backdrop, gives the "editor canvas" feel */
+.bg-grid{
+  position:fixed;
+  inset:0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.045) 1px, transparent 1px);
+  background-size: 22px 22px;
+  pointer-events:none;
+}
+
+/* ---------------------------------------------
+   IDE window
+--------------------------------------------- */
+.ide{
+  width:100%;
+  max-width: 860px;
+  background: var(--bg-editor);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.55), 0 2px 0 rgba(255,255,255,0.02) inset;
+  overflow:hidden;
+  position:relative;
+  z-index:1;
+}
+
+/* Titlebar */
+.titlebar{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding: 12px 16px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+}
+
+.dots{ display:flex; gap:8px; }
+.dot{ width:11px; height:11px; border-radius:50%; display:block; }
+.dot.red{ background:#ff5f56; }
+.dot.yellow{ background:#ffbd2e; }
+.dot.green{ background:#27c93f; }
+
+.filename{
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-dim);
+  flex:1;
+  text-align:center;
+  margin-right: 70px;
+}
+
+.conn{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.conn-dot{
+  width:7px; height:7px; border-radius:50%;
+  background: var(--text-faint);
+  transition: background .3s ease, box-shadow .3s ease;
+}
+.conn.online .conn-dot{ background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+.conn.offline .conn-dot{ background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); }
+
+/* Tab bar = question progress, real signal not decoration */
+.tabbar{
+  display:flex;
+  background: var(--bg-inset);
+  border-bottom: 1px solid var(--border);
+  overflow-x:auto;
+}
+.tab{
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  padding: 10px 18px;
+  color: var(--text-faint);
+  border-right: 1px solid var(--border-soft);
+  white-space:nowrap;
+  position:relative;
+  transition: color .2s ease;
+}
+.tab.done{ color: var(--accent-green); }
+.tab.active{
+  color: var(--text-main);
+  background: var(--bg-editor);
+}
+.tab.active::after{
+  content:"";
+  position:absolute;
+  left:0; right:0; bottom:-1px;
+  height:2px;
+  background: var(--accent-blue);
+}
+
+/* ---------------------------------------------
+   Editor body
+--------------------------------------------- */
+.editor{
+  display:flex;
+  padding: 22px 0 8px;
+}
+
+.gutter{
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-faint);
+  text-align:right;
+  padding: 0 14px 0 20px;
+  user-select:none;
+  line-height: 1.9;
+}
+
+.pane{
+  flex:1;
+  padding-right: 26px;
+  font-family: var(--font-mono);
+}
+
+.line{
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.comment{
+  color: var(--accent-green);
+  font-style: italic;
+  padding-bottom: 14px;
+  word-break: break-word;
+}
+.comment .hash{ color: var(--text-faint); font-style: normal; }
+#questionText{ transition: opacity .25s ease; }
+#questionText strong{ font-style: normal; color: var(--accent-green); }
+
+.code-line{ color: var(--text-dim); }
+.kw{ color: var(--accent-blue); }
+.fn{ color: var(--accent-amber); }
+.punct{ color: var(--accent-purple); }
+
+.answer-wrap{
+  display:flex;
+  margin: 6px 0 18px;
+}
+.indent{ color: transparent; white-space:pre; }
+
+textarea{
+  flex:1;
+  min-height: 130px;
+  resize: vertical;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 14.5px;
+  line-height: 1.6;
+  padding: 14px 16px;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease, opacity .2s ease;
+}
+textarea::placeholder{ color: var(--text-faint); font-style: italic; }
+textarea:focus{
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(108,158,248,0.15);
+}
+textarea:disabled{ opacity: .45; cursor:not-allowed; }
+
+/* ---------------------------------------------
+   Controls
+--------------------------------------------- */
+.controls{
+  display:flex;
+  gap: 12px;
+  padding-bottom: 20px;
+  font-family: var(--font-body);
+}
+
+.btn{
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 11px 20px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  cursor:pointer;
+  transition: transform .12s ease, filter .15s ease, opacity .15s ease;
+}
+.btn:active{ transform: scale(0.97); }
+.btn:disabled{ opacity:.35; cursor:not-allowed; transform:none; }
+
+.btn-run{
+  background: var(--accent-blue);
+  color: #0d1017;
+}
+.btn-run:hover:not(:disabled){ filter: brightness(1.1); }
+
+.btn-submit{
+  background: transparent;
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+}
+.btn-submit:hover:not(:disabled){ background: rgba(126,198,153,0.1); }
+
+/* ---------------------------------------------
+   Terminal output
+--------------------------------------------- */
+.terminal{
+  border-top: 1px solid var(--border);
+  background: var(--bg-inset);
+}
+.terminal-head{
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.chevron{ color: var(--accent-blue); margin-right:6px; }
+
+.terminal-body{
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.75;
+  padding: 16px 20px 20px;
+  min-height: 90px;
+  max-height: 260px;
+  overflow-y:auto;
+  color: var(--text-dim);
+}
+.muted{ color: var(--text-faint); }
+
+.cursor{
+  display:inline-block;
+  width: 7px;
+  height: 14px;
+  background: var(--accent-blue);
+  margin-left: 4px;
+  vertical-align: -2px;
+  animation: blink 1s steps(1) infinite;
+}
+@keyframes blink{ 50%{ opacity:0; } }
+
+.score-line{ font-size: 15px; margin-bottom: 8px; }
+.score-value{ font-weight: 700; }
+.score-high{ color: var(--accent-green); }
+.score-mid{ color: var(--accent-amber); }
+.score-low{ color: var(--accent-red); }
+
+.fb-block{ margin-top: 6px; color: var(--text-main); }
+.fb-label{ color: var(--text-faint); text-transform:uppercase; font-size: 11px; letter-spacing:.04em; display:block; margin-top:10px; }
+.fb-answer{ color: var(--accent-purple); }
+
+/* ---------------------------------------------
+   Status bar
+--------------------------------------------- */
+.statusbar{
+  display:flex;
+  align-items:center;
+  gap: 16px;
+  padding: 10px 20px;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.progress-track{
+  flex:1;
+  height: 6px;
+  border-radius: 4px;
+  background: var(--bg-inset);
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  width:0%;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+  transition: width .5s ease;
+}
+
+#avgScore{ color: var(--accent-amber); }
+
+/* ---------------------------------------------
+   Responsive
+--------------------------------------------- */
+@media (max-width: 640px){
+  body{ padding: 20px 10px; }
+  .filename{ display:none; }
+  .gutter{ display:none; }
+  .pane{ padding-right: 16px; padding-left: 16px; }
+  .controls{ flex-direction:column; }
+  .btn{ width:100%; }
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .cursor{ animation:none; }
+  .btn, textarea, .progress-fill, .conn-dot{ transition:none; }
+}

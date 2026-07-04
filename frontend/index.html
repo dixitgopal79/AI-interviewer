@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Interviewer — ai_interview.py</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="bg-grid"></div>
+
+<div class="ide">
+
+  <!-- Titlebar -->
+  <div class="titlebar">
+    <div class="dots">
+      <span class="dot red"></span>
+      <span class="dot yellow"></span>
+      <span class="dot green"></span>
+    </div>
+    <div class="filename">ai_interview.py</div>
+    <div class="conn" id="connStatus">
+      <span class="conn-dot"></span>
+      <span class="conn-label">connecting…</span>
+    </div>
+  </div>
+
+  <!-- Tab bar = question progress -->
+  <div class="tabbar" id="tabbar"></div>
+
+  <!-- Editor body -->
+  <div class="editor">
+
+    <div class="gutter" id="gutter"><span>1</span></div>
+
+    <div class="pane">
+
+      <div class="line comment" id="questionLine">
+        <span class="hash">#</span> <span id="questionText">Click <strong>Run</strong> to load your first question…</span>
+      </div>
+
+      <div class="line code-line">
+        <span class="kw">def</span> <span class="fn">your_answer</span><span class="punct">():</span>
+      </div>
+
+      <div class="answer-wrap">
+        <span class="indent">    </span>
+        <textarea id="answer" spellcheck="false" placeholder="return &quot;type your answer here…&quot;" disabled></textarea>
+      </div>
+
+      <div class="controls">
+        <button id="startBtn" class="btn btn-run">▶ Run interview</button>
+        <button id="submitBtn" class="btn btn-submit" disabled>⏎ Submit answer</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Terminal / feedback output -->
+  <div class="terminal" id="terminal">
+    <div class="terminal-head">
+      <span class="chevron">›_</span> output
+    </div>
+    <div class="terminal-body" id="terminalBody">
+      <span class="muted">waiting for input…</span><span class="cursor"></span>
+    </div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <div class="status-left">
+      <span id="progressLabel">0 / 5 answered</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="status-right" id="avgScore">avg score —</div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
